@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ventas" pageWidth="595" pageHeight="300" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1f690a3-5977-4467-85f8-6b0bcd5b7210">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Taqueria"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    CAST(GETDATE() AS DATE) AS FechaReporte,
+    Corte,
+    COUNT(idPedido) AS NumeroPedidos,
+    SUM(total) AS VentaTotal,
+    CAST(AVG(CAST(total AS DECIMAL(10,2))) AS DECIMAL(10,2)) AS PromedioTicket,
+    
+    CAST(
+        SUM(total) * 100.0 / SUM(SUM(total)) OVER()
+        AS DECIMAL(5,2)
+    ) AS PorcentajeDelDia,
+
+    -- 🔥 TOTAL DEL DÍA
+    SUM(SUM(total)) OVER() AS TotalDia
+
+FROM (
+    SELECT 
+        idPedido,
+        total,
+        fecha,
+        CASE 
+            WHEN DATEPART(HOUR, fecha) >= 8 AND DATEPART(HOUR, fecha) < 15 
+                THEN 'Corte 1'
+            WHEN DATEPART(HOUR, fecha) >= 15 AND DATEPART(HOUR, fecha) < 24 
+                THEN 'Corte 2'
+        END AS Corte
+    FROM Pedido
+    WHERE CAST(fecha AS DATE) = CAST(GETDATE() AS DATE)
+) AS SubConsulta
+
+WHERE Corte IS NOT NULL
+GROUP BY Corte
+ORDER BY Corte;]]>
+	</queryString>
+	<field name="FechaReporte" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="FechaReporte"/>
+		<property name="com.jaspersoft.studio.field.label" value="FechaReporte"/>
+	</field>
+	<field name="Corte" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="Corte"/>
+		<property name="com.jaspersoft.studio.field.label" value="Corte"/>
+	</field>
+	<field name="NumeroPedidos" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="NumeroPedidos"/>
+		<property name="com.jaspersoft.studio.field.label" value="NumeroPedidos"/>
+	</field>
+	<field name="VentaTotal" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="VentaTotal"/>
+		<property name="com.jaspersoft.studio.field.label" value="VentaTotal"/>
+	</field>
+	<field name="PromedioTicket" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PromedioTicket"/>
+		<property name="com.jaspersoft.studio.field.label" value="PromedioTicket"/>
+	</field>
+	<field name="PorcentajeDelDia" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PorcentajeDelDia"/>
+		<property name="com.jaspersoft.studio.field.label" value="PorcentajeDelDia"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="70" splitType="Stretch">
+			<staticText>
+				<reportElement style="Title" x="0" y="13" width="480" height="33" uuid="6f9c1004-6140-4588-9c4f-d75824835765"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[Taqueria "El Bigotes"]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="SubTitle" x="117" y="46" width="283" height="22" uuid="8e16dabd-2e54-471b-9652-83e1d55379ec"/>
+				<text><![CDATA[REPORTE DE VENTAS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="35" width="555" height="1" uuid="544e89f7-0fd1-4142-aa23-e335e3be7007"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<staticText>
+				<reportElement style="Column header" x="0" y="19" width="92" height="15" uuid="db7dfb6b-0bef-40e0-b3a3-52b7921813e1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="064554d3-1dd2-4966-ace5-1d2e3e0996df"/>
+				</reportElement>
+				<text><![CDATA[Fecha]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="92" y="19" width="92" height="15" uuid="240a2046-e163-4c7e-8082-c8c4f40eec87">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fb69e7b7-31eb-4d16-b275-4d73303bd3c7"/>
+				</reportElement>
+				<text><![CDATA[Corte]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="184" y="19" width="92" height="15" uuid="6357b3df-0925-4393-a74d-de3cb08e707b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86ad1219-530a-46f4-94dd-e38dd7cfdf98"/>
+				</reportElement>
+				<text><![CDATA[Órdenes]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="276" y="19" width="92" height="15" uuid="ea06fa48-843c-4f60-9013-2665d05abea8">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="857ffaae-3ec6-4ce5-96c7-d4aa12dcde6d"/>
+				</reportElement>
+				<text><![CDATA[Venta Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="368" y="19" width="102" height="15" uuid="c247d217-837c-4eec-af31-60280e5b681c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d26b8744-8736-4e43-b9e4-54f53fea5a3d"/>
+				</reportElement>
+				<text><![CDATA[Ticket promedio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Column header" x="475" y="19" width="100" height="15" uuid="9da1b791-bc4a-472d-97b0-06fdcbaba657">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dc0c3206-aaa9-421f-aea8-ef82c42ab1d0"/>
+				</reportElement>
+				<text><![CDATA[Porcentajedeldía]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="15" width="555" height="1" uuid="cb229859-ab9a-4aa3-afa2-84439642f4ee"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement style="Detail" x="0" y="0" width="92" height="15" uuid="40b0b6d2-21e7-460f-9943-49f2d810ce4e">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="064554d3-1dd2-4966-ace5-1d2e3e0996df"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{FechaReporte}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="92" y="0" width="92" height="15" uuid="6758ecac-d5b0-4fb8-a516-5eeb42a7ae53">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fb69e7b7-31eb-4d16-b275-4d73303bd3c7"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{Corte}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="190" y="0" width="86" height="15" uuid="808d77d9-0cf9-4769-9e6b-cdb830fa3993">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="86ad1219-530a-46f4-94dd-e38dd7cfdf98"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{NumeroPedidos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="284" y="0" width="84" height="15" uuid="ea78d71f-032d-4923-9e1a-18f91b55684f">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="857ffaae-3ec6-4ce5-96c7-d4aa12dcde6d"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{VentaTotal}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="380" y="0" width="80" height="15" uuid="50cd748a-b21b-4a72-8ad0-012f4f67a2a1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="d26b8744-8736-4e43-b9e4-54f53fea5a3d"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PromedioTicket}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Detail" x="480" y="0" width="92" height="15" uuid="04e291b6-a7aa-4919-8dc9-6e24f2217b63">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="dc0c3206-aaa9-421f-aea8-ef82c42ab1d0"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{PorcentajeDelDia}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="3" width="555" height="1" uuid="401e0e59-de38-4dd2-8257-418cb489177c"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="433" y="0" width="80" height="20" uuid="deb23d85-47bb-4de6-978e-113ff117188c"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="0" width="40" height="20" uuid="c6ce76ba-6e11-41e2-9415-72dc2eff001b"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="0" width="197" height="20" uuid="5a79d2a0-bcde-4ad5-adf0-c4eb2066f6dd"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

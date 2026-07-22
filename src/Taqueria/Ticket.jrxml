@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.21.3.final using JasperReports Library version 6.21.3-4a3078d20785ebe464f18037d738d12fc98c13cf  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Ticket" pageWidth="226" pageHeight="300" columnWidth="206" leftMargin="10" rightMargin="10" topMargin="10" bottomMargin="10" uuid="5ff18366-ecf8-4376-b405-ad4113e8debe">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Taqueria"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<property name="net.sf.jasperreports.export.pdf.force.linebreak.policy" value="true"/>
+	<parameter name="idPedido" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT 
+            p.idPedido,
+            p.fecha,
+            dp.cantidad,
+            pr.nombre AS nombreProducto,
+            pr.precio,
+            dp.subtotal,
+            p.total
+        FROM Pedido p
+        INNER JOIN DetallePedido dp ON p.idPedido = dp.idPedido
+        INNER JOIN Producto pr ON dp.idProducto = pr.idProducto
+        WHERE p.idPedido = $P{idPedido}]]>
+	</queryString>
+	<field name="idPedido" class="java.lang.Integer"/>
+	<field name="fecha" class="java.sql.Timestamp"/>
+	<field name="cantidad" class="java.lang.Integer"/>
+	<field name="nombreProducto" class="java.lang.String"/>
+	<field name="precio" class="java.math.BigDecimal"/>
+	<field name="subtotal" class="java.math.BigDecimal"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<variable name="TotalGeneral" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{subtotal}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="70">
+			<staticText>
+				<reportElement x="0" y="0" width="206" height="20" uuid="5038bc4d-9a25-48fe-9e42-554a1ec7d7df"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Taquería "El Bigotes"]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="20" width="206" height="15" uuid="cbdf94df-6c1c-46db-b421-0e537aecffbe"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[TICKET DE VENTA]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="35" width="206" height="15" uuid="1ce279bf-b603-4a5a-a587-95dc7c9a6817"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Pedido #: " + $P{idPedido}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH:mm">
+				<reportElement x="0" y="50" width="206" height="15" uuid="218e257d-aeed-44c3-b915-27d2351ab906"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA[$F{fecha}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField>
+				<reportElement positionType="Float" x="0" y="0" width="25" height="15" uuid="d59aaa55-baf0-4f25-a44e-0d5a3d6d2d1c"/>
+				<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" x="30" y="0" width="100" height="15" uuid="713add47-794f-4024-80ed-0ca374bfb1fc"/>
+				<textFieldExpression><![CDATA[$F{nombreProducto}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$ #,##0.00">
+				<reportElement positionType="Float" x="135" y="0" width="70" height="15" uuid="ae4b55e0-6893-4b23-aa28-3a1aa04e4117"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[$F{subtotal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="50">
+			<line>
+				<reportElement x="0" y="0" width="206" height="1" uuid="3ac00dd4-78a6-4932-8272-a9ac2ec8b2b2"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="10" width="80" height="20" uuid="5799eaaa-440e-4eea-8bba-a104e94d92d6"/>
+				<textElement>
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL:]]></text>
+			</staticText>
+			<textField pattern="$ #,##0.00">
+				<reportElement x="106" y="10" width="100" height="20" uuid="c368ac33-59b9-440a-8ba4-5c22bd4ff0b9"/>
+				<textElement textAlignment="Right">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TotalGeneral}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
